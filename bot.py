@@ -13,6 +13,8 @@ from pyrogram.types import (
     InlineKeyboardMarkup, InlineKeyboardButton, Message,
     CallbackQuery
 )
+# 🔥 NEW: টেলিগ্রামের ব্যান এবং স্প্যাম ঠেকানোর জন্য স্পেশাল লাইব্রেরি
+from pyrogram.errors import FloodWait, UserIsBlocked, PeerIdInvalid
 from flask import Flask
 
 # মডুলার সিস্টেম থেকে ইমপোর্ট
@@ -98,6 +100,7 @@ async def start_cmd(client, message):
                 final_caption = generate_file_caption(post["details"]) if "details" in post else f"🎥 **Here are your files!**\n\n🤖 Powered by {client.me.mention}"
                 
                 msg_ids = []
+                # 🔥 Nuclear Bomb Proof Anti-Spam Logic for Batch Files
                 for link in post["links"]:
                     if link.get("tg_url") and "get-" in link["tg_url"]:
                         try:
@@ -110,7 +113,23 @@ async def start_cmd(client, message):
                                 protect_content=False
                             )
                             msg_ids.append(file_msg.id)
-                            await asyncio.sleep(0.5)
+                            await asyncio.sleep(1.2) # 🔥 Safe Delay (Prevents Spam Detection)
+                            
+                        except FloodWait as e:
+                            logger.warning(f"⚠️ FloodWait Alert! Telegram wants us to wait {e.value}s.")
+                            await asyncio.sleep(e.value + 1.0) # টেলিগ্রামের দেওয়া সময়ের চেয়ে ১ সেকেন্ড বেশি ঘুমাবে
+                            try:
+                                file_msg = await client.copy_message(
+                                    chat_id=uid, from_chat_id=DB_CHANNEL_ID, message_id=msg_id, 
+                                    caption=final_caption, protect_content=False
+                                )
+                                msg_ids.append(file_msg.id)
+                                await asyncio.sleep(1.2)
+                            except: pass
+                            
+                        except (UserIsBlocked, PeerIdInvalid):
+                            # 🔥 ইউজার যদি মাঝপথে বট ব্লক করে দেয়, তাহলে স্প্যামিং বন্ধ করে লুপ ব্রেক করবে
+                            break
                         except: pass
                             
                 await temp_msg.delete()
@@ -144,6 +163,10 @@ async def start_cmd(client, message):
                     warning_msg = await message.reply_text(f"⚠️ **সতর্কবার্তা:** কপিরাইট এড়াতে এই ফাইলটি **{time_str}** পর ডিলিট হয়ে যাবে!\n\n📥 দয়া করে এখনই ফাইলটি Save করে রাখুন।", quote=True)
                     asyncio.create_task(auto_delete_task(client, uid,[file_msg.id, warning_msg.id], timer))
                 return 
+            except FloodWait as e:
+                await asyncio.sleep(e.value + 1)
+                file_msg = await client.copy_message(chat_id=uid, from_chat_id=DB_CHANNEL_ID, message_id=msg_id, caption=final_caption, protect_content=False)
+                await temp_msg.delete()
             except Exception as e: return await message.reply_text("❌ **File Not Found!**")
 
     user_conversations.pop(uid, None)
@@ -203,7 +226,6 @@ async def set_auto_delete_cmd(client, message):
     try: await set_auto_delete_timer_db(int(message.command[1])); await message.reply_text(f"✅ Timer Updated: **{message.command[1]} seconds**")
     except: await message.reply_text("⚠️ Usage: `/setdel 600`")
 
-# 🔥 নতুন কমান্ড: Website Waiting Timer
 @bot.on_message(filters.command("settimer") & filters.user(OWNER_ID))
 async def set_wait_timer_cmd(client, message):
     try: 
@@ -213,13 +235,25 @@ async def set_wait_timer_cmd(client, message):
         await message.reply_text(f"✅ Website Timer Updated: **{seconds} seconds**")
     except: await message.reply_text("⚠️ Usage: `/settimer 5`")
 
+# 🔥 Nuclear Bomb Proof Anti-Spam Logic for Broadcast
 @bot.on_message(filters.command("broadcast") & filters.user(OWNER_ID))
 async def broadcast_msg(client, message):
     if not message.reply_to_message: return await message.reply_text("⚠️ Reply to a message.")
     msg = await message.reply_text("⏳ Broadcasting...")
     count = 0
     async for user in users_col.find({}):
-        try: await message.reply_to_message.copy(user["_id"]); count += 1; await asyncio.sleep(0.1) 
+        try: 
+            await message.reply_to_message.copy(user["_id"])
+            count += 1
+            await asyncio.sleep(0.5) # 🔥 Safe Delay for Broadcast
+        except FloodWait as e:
+            await asyncio.sleep(e.value + 1.0)
+            try:
+                await message.reply_to_message.copy(user["_id"])
+                count += 1
+            except: pass
+        except (UserIsBlocked, PeerIdInvalid):
+            pass # ইউজার ব্লক করলে ইগনোর করবে
         except: pass
     await msg.edit_text(f"✅ Broadcast Sent to **{count}** users.")
 
@@ -595,9 +629,10 @@ async def generate_final_post(client, uid, message):
             new_poster = await loop.run_in_executor(None, upload_to_catbox_bytes, poster_bytes)
             if new_poster: convo["details"]["manual_poster_url"] = new_poster 
         
-        # 🔥 Database থেকে ডাইনামিক টাইমার নিয়ে পাস করা হচ্ছে
         wait_time = await get_wait_timer()
-        html = generate_html_code(convo["details"], convo["links"], await get_user_ads(uid), await get_owner_ads(), await get_admin_share(), wait_time)
+        convo["details"]["wait_time"] = wait_time
+
+        html = generate_html_code(convo["details"], convo["links"], await get_user_ads(uid), await get_owner_ads(), await get_admin_share())
         caption = generate_formatted_caption(convo["details"], pid)
         convo["final"] = {"html": html}
         
@@ -649,7 +684,7 @@ if __name__ == "__main__":
     flask_thread.daemon = True
     flask_thread.start()
     
-    print("🚀 Ultimate SPA Bot is Starting with Plugin System...")
+    print("🚀 Ultimate SPA Bot is Starting with Nuclear Security...")
 
     loop = asyncio.get_event_loop()
     loop.run_until_complete(main())
