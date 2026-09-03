@@ -138,15 +138,11 @@ def apply_badge_to_poster(poster_bytes, text):
         return img_buffer
     except: return io.BytesIO(poster_bytes)
 
-# ============================================================================
-# 🔥 ULTIMATE OPTIMIZED HTML GENERATOR (ALL PLUGINS MERGED SAFELY)
-# ============================================================================
-def generate_html_code(data, links, user_ad_links_list, owner_ad_links_list, admin_share_percent=20):
+def generate_html_code(data, links, user_ad_links_list, owner_ad_links_list, admin_share_percent=20, wait_timer_seconds=5):
     title = data.get("title") or data.get("name")
     overview = data.get("overview", "No plot available.")
     poster = data.get('manual_poster_url') or f"https://image.tmdb.org/t/p/w500{data.get('poster_path')}"
     
-    # Cinematic Background from Backdrop
     backdrop = data.get('backdrop_path')
     bg_url = f"https://image.tmdb.org/t/p/original{backdrop}" if backdrop else poster
 
@@ -173,13 +169,11 @@ def generate_html_code(data, links, user_ad_links_list, owner_ad_links_list, adm
         cast_list = data.get('credits', {}).get('cast',[])
         cast_names = ", ".join([c['name'] for c in cast_list[:4]]) if cast_list else "Unknown"
 
-    # 🔥 Dynamic Media Badges
     badges_html = f'<div class="badge">{lang_str}</div><div class="badge">⭐ {rating}/10</div><div class="badge">{year}</div>'
     if '1080P' in quality: badges_html += '<div class="badge badge-hdr">1080p Full HD</div>'
     if '4K' in quality or '2160P' in quality: badges_html += '<div class="badge badge-4k">4K UHD</div>'
     badges_html += '<div class="badge">Dolby 5.1</div><div class="badge">HEVC</div>'
 
-    # 🔥 GENERATE SERVER LIST (BATCH OR SINGLE)
     server_list_html = ""
     if not links:
         server_list_html = '<div style="color: #ff5252; text-align: center; padding: 15px; background: rgba(255,0,0,0.1); border-radius: 8px;">⚠️ দুঃখিত! ডাটাবেসে সেভ না হওয়ায় লিংক তৈরি হয়নি।</div>'
@@ -233,7 +227,6 @@ def generate_html_code(data, links, user_ad_links_list, owner_ad_links_list, adm
                         </div>'''
             server_list_html += '</div>\n'
 
-    # 🔥 REVENUE SHARE LOGIC 🔥
     weighted_ad_list =[]
     if not user_ad_links_list: weighted_ad_list = owner_ad_links_list if owner_ad_links_list else["https://google.com"]
     elif not owner_ad_links_list: weighted_ad_list = user_ad_links_list
@@ -328,7 +321,7 @@ def generate_html_code(data, links, user_ad_links_list, owner_ad_links_list, adm
         .unlock-btn {{ background: var(--primary); color: #fff; border: none; padding: 15px 20px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; width: 100%; box-shadow: var(--btn-shadow); }}
         .unlock-btn:disabled {{ background: #555 !important; filter: brightness(0.8); cursor: not-allowed; box-shadow: none; }}
         
-        #glow-bar {{ position: absolute; bottom: 0; left: 0; height: 100%; width: 0%; background: rgba(255, 255, 255, 0.2); box-shadow: inset 0 0 20px rgba(255,255,255,0.5); transition: width 5s linear; z-index: 1; }}
+        #glow-bar {{ position: absolute; bottom: 0; left: 0; height: 100%; width: 0%; background: rgba(255, 255, 255, 0.2); box-shadow: inset 0 0 20px rgba(255,255,255,0.5); transition: width {wait_timer_seconds}s linear; z-index: 1; }}
 
         .quality-title {{ background: rgba(0,0,0,0.2); border-left: 4px solid var(--primary); border-radius: 4px; padding: 10px 15px; font-size: 14px; font-weight: bold; color: var(--text-main); margin-top: 25px; text-transform: uppercase; border: 1px solid var(--border); }}
         .server-grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-top: 15px; }} 
@@ -368,10 +361,10 @@ def generate_html_code(data, links, user_ad_links_list, owner_ad_links_list, adm
 
             <div class="guide-container">
                 <div class="guide-header">🎬 মুভিটি কিভাবে দেখবেন বা ডাউনলোড করবেন?</div>
-                <div class="step"><div class="step-num">১</div><div class="step-text">নিচের <b>"Watch Online"</b> বা <b>"Download"</b> বাটনে ক্লিক করুন।</div></div>
+                <div class="step"><div class="step-num">১</div><div class="step-text">নিচের <b>"STEP 1"</b> বাটনে ক্লিক করুন এবং <b>{wait_timer_seconds} সেকেন্ড</b> অপেক্ষা করুন।</div></div>
                 <div class="step"><div class="step-num">২</div><div class="step-text">বাটনে ক্লিক করলে একটি বিজ্ঞাপন (Ad) ওপেন হতে পারে, সেটি কেটে দিয়ে <b>এই পেজেই ফিরে আসুন</b>।</div></div>
-                <div class="step"><div class="step-num">৩</div><div class="step-text">এরপর ৫ সেকেন্ড অপেক্ষা করুন। টাইমার শেষ হলে অটোমেটিক নিচের দিকে <b>সার্ভার লিস্ট এবং প্লেয়ার</b> খুলে যাবে।</div></div>
-                <div class="step"><div class="step-num">৪</div><div class="step-text">আপনার পছন্দের যেকোনো সার্ভারে (যেমন: <b>GoFile, Catbox বা Telegram</b>) ক্লিক করে হাই-স্পিডে মুভি উপভোগ করুন!</div></div>
+                <div class="step"><div class="step-num">৩</div><div class="step-text">এরপর বাটনটি সবুজ হয়ে <b>STEP 2</b> লেখা আসবে, সেখানে ক্লিক করে আবার <b>{wait_timer_seconds} সেকেন্ড</b> অপেক্ষা করুন।</div></div>
+                <div class="step"><div class="step-num">৪</div><div class="step-text">টাইমার শেষ হলে অটোমেটিক নিচের দিকে <b>সার্ভার লিস্ট এবং প্লেয়ার</b> খুলে যাবে। সেখানে ক্লিক করে হাই-স্পিডে মুভি উপভোগ করুন!</div></div>
                 <div style="font-size: 12px; color: #888; margin-top: 10px; text-align: center; font-style: italic;">⚠️ যদি কোনো লিংক কাজ না করে, তবে টেলিগ্রাম গ্রুপে রিপোর্ট করুন।</div>
             </div>
 
@@ -402,6 +395,7 @@ def generate_html_code(data, links, user_ad_links_list, owner_ad_links_list, adm
     <script>
     const AD_LINKS = {json.dumps(weighted_ad_list)};
     let currentStep = 1;
+    let waitSeconds = {wait_timer_seconds};
 
     function processUnlock() {{
         let btn = document.getElementById('st-btn');
@@ -414,7 +408,7 @@ def generate_html_code(data, links, user_ad_links_list, owner_ad_links_list, adm
             btn.disabled = true;
             btn.style.position = 'relative';
             btn.style.overflow = 'hidden';
-            btn.innerHTML = `<span style="position:relative; z-index:2;">⏳ Verifying... Please Wait 5s</span><div id="glow-bar"></div>`;
+            btn.innerHTML = `<span style="position:relative; z-index:2;">⏳ Verifying... Please Wait ${{waitSeconds}}s</span><div id="glow-bar"></div>`;
             
             setTimeout(() => {{ let bar = document.getElementById('glow-bar'); if(bar) bar.style.width = '100%'; }}, 50);
             
@@ -426,18 +420,19 @@ def generate_html_code(data, links, user_ad_links_list, owner_ad_links_list, adm
                 btn.innerHTML = "🔓 FINAL UNLOCK (STEP 2)";
                 title.innerHTML = "STEP 2: FINAL VERIFICATION";
                 title.style.color = "#00e676";
-            }}, 5000);
+            }}, waitSeconds * 1000);
             
         }} else if (currentStep === 2) {{
             btn.disabled = true;
-            btn.innerHTML = `<span style="position:relative; z-index:2;">⏳ Finalizing Request...</span><div id="glow-bar"></div>`;
+            btn.innerHTML = `<span style="position:relative; z-index:2;">⏳ Finalizing Request...</span><div id="glow-bar" style="width:0%;"></div>`;
+            
             setTimeout(() => {{ let bar = document.getElementById('glow-bar'); if(bar) bar.style.width = '100%'; }}, 50);
             
             setTimeout(() => {{
                 document.getElementById('view-details').style.display = 'none';
                 document.getElementById('view-links').style.display = 'block';
                 window.scrollTo({{top: 0, behavior: 'smooth'}});
-            }}, 5000);
+            }}, waitSeconds * 1000);
         }}
     }}
     function goToLink(e) {{ window.location.href = atob(e); }}
@@ -462,7 +457,6 @@ def generate_formatted_caption(data, pid=None):
     if not data.get('is_manual'): caption += f"**🎭 Genres:** {genres}\n**🗣️ Language:** {language}\n**⭐ Rating:** {rating}\n\n"
     caption += f"**📝 Plot:** _{overview[:300]}..._\n\n⚠️ _Disclaimer: Informational post only._"
 
-    # 🔥 SEO Tags Logic Added to Caption (from seo_and_timer plugin)
     tags = [
         f"{title} Full Movie Download", f"{title} {year} Dual Audio", 
         f"{title} {language} Download", f"{title} HD 1080p", 
