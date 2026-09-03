@@ -1,0 +1,12 @@
+pyrofork
+tgcrypto
+aiohttp
+requests
+numpy
+opencv-python-headless
+Pillow
+flask
+python-dotenv
+motor
+dnspython
+pymongo
