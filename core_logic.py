@@ -138,7 +138,12 @@ def apply_badge_to_poster(poster_bytes, text):
         return img_buffer
     except: return io.BytesIO(poster_bytes)
 
-def generate_html_code(data, links, user_ad_links_list, owner_ad_links_list, admin_share_percent=20, wait_timer_seconds=5):
+# 🔥 Plugin Compatibility Maintained (5 arguments only)
+def generate_html_code(data, links, user_ad_links_list, owner_ad_links_list, admin_share_percent=20):
+    
+    # 🔥 Data Dictionary থেকে টাইমারটি বের করা হলো (এতে আর এরর আসবে না)
+    wait_timer_seconds = data.get("wait_time", 5)
+    
     title = data.get("title") or data.get("name")
     overview = data.get("overview", "No plot available.")
     poster = data.get('manual_poster_url') or f"https://image.tmdb.org/t/p/w500{data.get('poster_path')}"
@@ -365,7 +370,7 @@ def generate_html_code(data, links, user_ad_links_list, owner_ad_links_list, adm
                 <div class="step"><div class="step-num">২</div><div class="step-text">বাটনে ক্লিক করলে একটি বিজ্ঞাপন (Ad) ওপেন হতে পারে, সেটি কেটে দিয়ে <b>এই পেজেই ফিরে আসুন</b>।</div></div>
                 <div class="step"><div class="step-num">৩</div><div class="step-text">এরপর বাটনটি সবুজ হয়ে <b>STEP 2</b> লেখা আসবে, সেখানে ক্লিক করে আবার <b>{wait_timer_seconds} সেকেন্ড</b> অপেক্ষা করুন।</div></div>
                 <div class="step"><div class="step-num">৪</div><div class="step-text">টাইমার শেষ হলে অটোমেটিক নিচের দিকে <b>সার্ভার লিস্ট এবং প্লেয়ার</b> খুলে যাবে। সেখানে ক্লিক করে হাই-স্পিডে মুভি উপভোগ করুন!</div></div>
-                <div style="font-size: 12px; color: #888; margin-top: 10px; text-align: center; font-style: italic;">⚠️ যদি কোনো লিংক কাজ না করে, তবে টেলিগ্রাম গ্রুপে রিপোর্ট করুন।</div>
+                <div style="font-size: 12px; color: #888; margin-top: 10px; text-align: center; font-style: italic;">⚠️ যদি কোনো লিংক কাজবিধা না করে, তবে টেলিগ্রাম গ্রুপে রিপোর্ট করুন।</div>
             </div>
 
             <div class="step-container" id="step-box">
