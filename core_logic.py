@@ -184,7 +184,7 @@ def generate_html_code(data, links, user_ad_links_list, owner_ad_links_list, adm
         server_list_html = '<div style="color: #ff5252; text-align: center; padding: 15px; background: rgba(255,0,0,0.1); border-radius: 8px;">⚠️ দুঃখিত! ডাটাবেসে সেভ না হওয়ায় লিংক তৈরি হয়নি।</div>'
     elif is_batch and post_id:
         tg_url = links[0].get("tg_url", "")
-        base_url = tg_url.split("?start=")[0] if "?start=" in tg_url else "https://t.me/koreandrama006"
+        base_url = tg_url.split("?start=")[0] if "?start=" in tg_url else "https://t.me/getnewlink11"
         batch_link = f"{base_url}?start=batch-{post_id}"
         batch_b64 = base64.b64encode(batch_link.encode('utf-8')).decode('utf-8')
         file_count = len(links)
@@ -302,7 +302,7 @@ def generate_html_code(data, links, user_ad_links_list, owner_ad_links_list, adm
         .badge-hdr {{ color: #00d1b2; border-color: #00d1b2; background: rgba(255,255,255,0.1); }}
         
         .info-box {{ display: flex; flex-direction: column; align-items: center; gap: 20px; margin-bottom: 25px; background: rgba(255,255,255,0.03) !important; border-radius: 20px !important; padding: 25px !important; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.05) !important; }}
-        .info-poster img {{ width: 180px; border-radius: 15px; box-shadow: var(--btn-shadow); border: 2px solid rgba(255,255,255,0.1) !important; transition: 0.5s; }}
+        .info-poster img { width: 180px; height: 270px; object-fit: cover; border-radius: 15px; box-shadow: var(--btn-shadow); border: 2px solid rgba(255,255,255,0.1) !important; transition: 0.5s; }
         .info-poster img:hover {{ transform: scale(1.05) translateY(-10px); }}
         
         .info-text {{ display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 400px; margin: 0 auto; }}
