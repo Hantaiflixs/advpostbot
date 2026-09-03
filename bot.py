@@ -28,7 +28,6 @@ user_conversations = {}
 upload_semaphore = asyncio.Semaphore(2)
 
 # ---- KOYEB FLASK SERVER ----
-# 🔥 Flask এর Development Warning হাইড করার কোড
 log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
 
@@ -39,7 +38,6 @@ def home():
     return "🤖 Ultimate SPA Bot Running on Koyeb (With Telegram Direct Forwarding)"
 
 def run_flask(): 
-    # Koyeb এর জন্য ডাইনামিক পোর্ট সেটআপ
     port = int(os.environ.get("PORT", 8080))
     app.run(host='0.0.0.0', port=port)
 
@@ -85,7 +83,6 @@ async def start_cmd(client, message):
     if len(message.command) > 1:
         payload = message.command[1]
         
-        # 🔥 নতুন সিস্টেম: ব্যাচ লিংকে ক্লিক করলে সব ফাইল একসাথে সেন্ড হবে
         if payload.startswith("batch-"):
             if await is_banned(uid): return await message.reply_text("🚫 **Access Denied:** You are banned.")
             try:
@@ -98,7 +95,6 @@ async def start_cmd(client, message):
                     
                 await temp_msg.edit_text("⏳ **Sending Files... Please wait**")
                 
-                # 🔥 ব্যাচ ফাইলের জন্য অটো-ক্যাপশন জেনারেট করা হলো
                 final_caption = generate_file_caption(post["details"]) if "details" in post else f"🎥 **Here are your files!**\n\n🤖 Powered by {client.me.mention}"
                 
                 msg_ids = []
@@ -106,7 +102,6 @@ async def start_cmd(client, message):
                     if link.get("tg_url") and "get-" in link["tg_url"]:
                         try:
                             msg_id = int(link["tg_url"].split("get-")[1])
-                            # 🔥 এখানে caption=final_caption যুক্ত করা হয়েছে
                             file_msg = await client.copy_message(
                                 chat_id=uid, 
                                 from_chat_id=DB_CHANNEL_ID, 
@@ -115,7 +110,7 @@ async def start_cmd(client, message):
                                 protect_content=False
                             )
                             msg_ids.append(file_msg.id)
-                            await asyncio.sleep(0.5) # FloodWait এড়াতে
+                            await asyncio.sleep(0.5)
                         except: pass
                             
                 await temp_msg.delete()
@@ -163,6 +158,7 @@ async def start_cmd(client, message):
         "👉 `/setapi <server> <key>` - আর্নিং সাইট সেট করতে (Only Admin)\n"
         "👉 `/setadlink <লিংক>` - নিজের অ্যাড লিংক সেট করতে\n"
         "👉 `/mysettings` - নিজের সেটিংস ও লিংক দেখতে\n"
+        "👉 `/settimer <seconds>` - ওয়েবসাইটের ওয়েটিং টাইম সেট করতে\n"
         "👉 `/cancel` - কোনো কাজ বাতিল করতে\n"
         "👉 `/edit <নাম বা ID>` - পোস্ট এডিট করতে"
     )
@@ -206,6 +202,16 @@ async def set_share_cmd(client, message):
 async def set_auto_delete_cmd(client, message):
     try: await set_auto_delete_timer_db(int(message.command[1])); await message.reply_text(f"✅ Timer Updated: **{message.command[1]} seconds**")
     except: await message.reply_text("⚠️ Usage: `/setdel 600`")
+
+# 🔥 নতুন কমান্ড: Website Waiting Timer
+@bot.on_message(filters.command("settimer") & filters.user(OWNER_ID))
+async def set_wait_timer_cmd(client, message):
+    try: 
+        seconds = int(message.command[1])
+        if seconds < 0: return await message.reply_text("⚠️ 0 বা তার বেশি দিন।")
+        await set_wait_timer_db(seconds)
+        await message.reply_text(f"✅ Website Timer Updated: **{seconds} seconds**")
+    except: await message.reply_text("⚠️ Usage: `/settimer 5`")
 
 @bot.on_message(filters.command("broadcast") & filters.user(OWNER_ID))
 async def broadcast_msg(client, message):
@@ -389,7 +395,7 @@ async def process_file_upload(client, message, uid, temp_name):
     finally:
         convo["pending_uploads"] = max(0, convo.get("pending_uploads", 0) - 1)
 
-@bot.on_message(filters.private & (filters.text | filters.video | filters.document | filters.photo) & ~filters.command(["start", "post", "manual", "edit", "history", "setadlink", "mysettings", "auth", "ban", "stats", "broadcast", "setownerads", "setshare", "setdel", "setapi", "cancel", "repost", "setup", "myconfig", "delsetup"]))
+@bot.on_message(filters.private & (filters.text | filters.video | filters.document | filters.photo) & ~filters.command(["start", "post", "manual", "edit", "history", "setadlink", "mysettings", "auth", "ban", "stats", "broadcast", "setownerads", "setshare", "setdel", "setapi", "cancel", "repost", "setup", "myconfig", "delsetup", "settimer"]))
 async def text_handler(client, message):
     uid = message.from_user.id
     if uid not in user_conversations: return
@@ -589,7 +595,9 @@ async def generate_final_post(client, uid, message):
             new_poster = await loop.run_in_executor(None, upload_to_catbox_bytes, poster_bytes)
             if new_poster: convo["details"]["manual_poster_url"] = new_poster 
         
-        html = generate_html_code(convo["details"], convo["links"], await get_user_ads(uid), await get_owner_ads(), await get_admin_share())
+        # 🔥 Database থেকে ডাইনামিক টাইমার নিয়ে পাস করা হচ্ছে
+        wait_time = await get_wait_timer()
+        html = generate_html_code(convo["details"], convo["links"], await get_user_ads(uid), await get_owner_ads(), await get_admin_share(), wait_time)
         caption = generate_formatted_caption(convo["details"], pid)
         convo["final"] = {"html": html}
         
