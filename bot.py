@@ -28,6 +28,10 @@ user_conversations = {}
 upload_semaphore = asyncio.Semaphore(2)
 
 # ---- KOYEB FLASK SERVER ----
+# 🔥 Flask এর Development Warning হাইড করার কোড
+log = logging.getLogger('werkzeug')
+log.setLevel(logging.ERROR)
+
 app = Flask(__name__)
 
 @app.route('/')
@@ -81,6 +85,7 @@ async def start_cmd(client, message):
     if len(message.command) > 1:
         payload = message.command[1]
         
+        # 🔥 নতুন সিস্টেম: ব্যাচ লিংকে ক্লিক করলে সব ফাইল একসাথে সেন্ড হবে
         if payload.startswith("batch-"):
             if await is_banned(uid): return await message.reply_text("🚫 **Access Denied:** You are banned.")
             try:
@@ -93,6 +98,7 @@ async def start_cmd(client, message):
                     
                 await temp_msg.edit_text("⏳ **Sending Files... Please wait**")
                 
+                # 🔥 ব্যাচ ফাইলের জন্য অটো-ক্যাপশন জেনারেট করা হলো
                 final_caption = generate_file_caption(post["details"]) if "details" in post else f"🎥 **Here are your files!**\n\n🤖 Powered by {client.me.mention}"
                 
                 msg_ids = []
@@ -100,6 +106,7 @@ async def start_cmd(client, message):
                     if link.get("tg_url") and "get-" in link["tg_url"]:
                         try:
                             msg_id = int(link["tg_url"].split("get-")[1])
+                            # 🔥 এখানে caption=final_caption যুক্ত করা হয়েছে
                             file_msg = await client.copy_message(
                                 chat_id=uid, 
                                 from_chat_id=DB_CHANNEL_ID, 
@@ -108,7 +115,7 @@ async def start_cmd(client, message):
                                 protect_content=False
                             )
                             msg_ids.append(file_msg.id)
-                            await asyncio.sleep(0.5)
+                            await asyncio.sleep(0.5) # FloodWait এড়াতে
                         except: pass
                             
                 await temp_msg.delete()
@@ -370,7 +377,6 @@ async def process_file_upload(client, message, uid, temp_name):
             bot_username = client.me.username if client.me else (await client.get_me()).username
             tg_link = f"https://t.me/{bot_username}?start=get-{copied_msg.id}"
             
-            # 🔥 ডেটাবেস ব্লোট (খালি None ইউআরএল) রিমুভ করে স্টোরেজ বাঁচানো হলো
             convo["links"].append({"label": temp_name, "tg_url": tg_link, "is_grouped": True})
             await status_msg.edit_text(f"✅ **আপলোড সম্পন্ন:** {temp_name}")
             
@@ -459,7 +465,6 @@ async def text_handler(client, message):
                 await message.reply_text(f"✅ **{convo['temp_name']}** ব্যাকগ্রাউন্ডে আপলোড শুরু হয়েছে!", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("➕ Add Another", callback_data=f"lnk_yes_{uid}"), InlineKeyboardButton("🏁 Finish", callback_data=f"lnk_no_{uid}")]]))
 
         elif text.startswith("http"):
-            # 🔥 ডেটাবেস ব্লোট ক্লিন করা হয়েছে 
             convo["links"].append({"label": convo["temp_name"], "url": text, "is_grouped": False})
             if convo.get("post_id"):
                  convo["state"] = "edit_mode"
