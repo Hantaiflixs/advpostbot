@@ -49,6 +49,14 @@ async def get_auto_delete_timer():
 async def set_auto_delete_timer_db(seconds):
     await settings_col.update_one({"_id": "main_config"}, {"$set": {"auto_delete_seconds": int(seconds)}}, upsert=True)
 
+# 🔥 নতুন: Website Wait Timer DB Functions
+async def get_wait_timer():
+    data = await settings_col.find_one({"_id": "main_config"})
+    return data.get("wait_timer_seconds", 5) if data else 5
+
+async def set_wait_timer_db(seconds):
+    await settings_col.update_one({"_id": "main_config"}, {"$set": {"wait_timer_seconds": int(seconds)}}, upsert=True)
+
 async def auto_delete_task(client, chat_id, message_ids, delay):
     if delay <= 0: return
     await asyncio.sleep(delay)
