@@ -138,19 +138,27 @@ def apply_badge_to_poster(poster_bytes, text):
         return img_buffer
     except: return io.BytesIO(poster_bytes)
 
+# ============================================================================
+# 🔥 ULTIMATE OPTIMIZED HTML GENERATOR (ALL PLUGINS MERGED SAFELY)
+# ============================================================================
 def generate_html_code(data, links, user_ad_links_list, owner_ad_links_list, admin_share_percent=20):
     title = data.get("title") or data.get("name")
     overview = data.get("overview", "No plot available.")
     poster = data.get('manual_poster_url') or f"https://image.tmdb.org/t/p/w500{data.get('poster_path')}"
+    
+    # Cinematic Background from Backdrop
+    backdrop = data.get('backdrop_path')
+    bg_url = f"https://image.tmdb.org/t/p/original{backdrop}" if backdrop else poster
 
     is_adult = data.get('adult', False) or data.get('force_adult', False)
     is_batch = data.get('is_batch', False)
     post_id = data.get('post_id', '')
+    quality = data.get('custom_quality', '').upper()
 
     theme = data.get("theme", "netflix")
-    if theme == "netflix": root_css = "--bg-color: #0f0f13; --box-bg: #1a1a24; --text-main: #ffffff; --text-muted: #d1d1d1; --primary: #E50914; --accent: #00d2ff; --border: #2a2a35; --btn-grad: linear-gradient(90deg, #E50914 0%, #ff5252 100%); --btn-shadow: 0 5px 15px rgba(229, 9, 20, 0.4);"
-    elif theme == "prime": root_css = "--bg-color: #0f171e; --box-bg: #1b2530; --text-main: #ffffff; --text-muted: #8197a4; --primary: #00A8E1; --accent: #00A8E1; --border: #2c3e50; --btn-grad: linear-gradient(90deg, #00A8E1 0%, #00d2ff 100%); --btn-shadow: 0 5px 15px rgba(0, 168, 225, 0.4);"
-    else: root_css = "--bg-color: #f4f4f9; --box-bg: #ffffff; --text-main: #333333; --text-muted: #555555; --primary: #6200ea; --accent: #6200ea; --border: #dddddd; --btn-grad: linear-gradient(90deg, #6200ea 0%, #b388ff 100%); --btn-shadow: 0 5px 15px rgba(98, 0, 234, 0.4);"
+    if theme == "netflix": root_css = "--bg-color: #0f0f13; --box-bg: #1a1a24; --text-main: #ffffff; --text-muted: #d1d1d1; --primary: #E50914; --accent: #00d2ff; --border: #2a2a35; --btn-grad: linear-gradient(90deg, #E50914 0%, #ff5252 100%); --btn-shadow: 0 10px 30px rgba(229, 9, 20, 0.4);"
+    elif theme == "prime": root_css = "--bg-color: #050505; --box-bg: #111111; --text-main: #eeeeee; --text-muted: #8197a4; --primary: #00A8E1; --accent: #00A8E1; --border: #222222; --btn-grad: linear-gradient(90deg, #00A8E1 0%, #00d2ff 100%); --btn-shadow: 0 10px 30px rgba(0, 168, 225, 0.4);"
+    else: root_css = "--bg-color: #1a1b26; --box-bg: #24283b; --text-main: #c0caf5; --text-muted: #a9b1d6; --primary: #ff79c6; --accent: #bb9af7; --border: #414868; --btn-grad: linear-gradient(90deg, #ff79c6 0%, #bd93f9 100%); --btn-shadow: 0 10px 30px rgba(255, 121, 198, 0.4);"
 
     lang_str = data.get('custom_language', 'Dual Audio').strip()
     if data.get('is_manual'):
@@ -165,6 +173,13 @@ def generate_html_code(data, links, user_ad_links_list, owner_ad_links_list, adm
         cast_list = data.get('credits', {}).get('cast',[])
         cast_names = ", ".join([c['name'] for c in cast_list[:4]]) if cast_list else "Unknown"
 
+    # 🔥 Dynamic Media Badges
+    badges_html = f'<div class="badge">{lang_str}</div><div class="badge">⭐ {rating}/10</div><div class="badge">{year}</div>'
+    if '1080P' in quality: badges_html += '<div class="badge badge-hdr">1080p Full HD</div>'
+    if '4K' in quality or '2160P' in quality: badges_html += '<div class="badge badge-4k">4K UHD</div>'
+    badges_html += '<div class="badge">Dolby 5.1</div><div class="badge">HEVC</div>'
+
+    # 🔥 GENERATE SERVER LIST (BATCH OR SINGLE)
     server_list_html = ""
     if not links:
         server_list_html = '<div style="color: #ff5252; text-align: center; padding: 15px; background: rgba(255,0,0,0.1); border-radius: 8px;">⚠️ দুঃখিত! ডাটাবেসে সেভ না হওয়ায় লিংক তৈরি হয়নি।</div>'
@@ -218,6 +233,7 @@ def generate_html_code(data, links, user_ad_links_list, owner_ad_links_list, adm
                         </div>'''
             server_list_html += '</div>\n'
 
+    # 🔥 REVENUE SHARE LOGIC 🔥
     weighted_ad_list =[]
     if not user_ad_links_list: weighted_ad_list = owner_ad_links_list if owner_ad_links_list else["https://google.com"]
     elif not owner_ad_links_list: weighted_ad_list = user_ad_links_list
@@ -229,24 +245,34 @@ def generate_html_code(data, links, user_ad_links_list, owner_ad_links_list, adm
     clean_desc = overview.replace('"', "'").replace('\n', ' ')
 
     return f"""
-    <!-- Hidden tags for Blogger SEO -->
+    <!-- 🛡️ Anti-AdBlock Script -->
+    <script>
+    async function detectAdBlock() {{
+      let adBlockEnabled = false;
+      const googleAdUrl = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js';
+      try {{ await fetch(new Request(googleAdUrl)).catch(_ => adBlockEnabled = true); }} catch (e) {{ adBlockEnabled = true; }}
+      if (adBlockEnabled) {{
+        document.body.innerHTML = `
+        <div style="position:fixed;top:0;left:0;width:100%;height:100%;background:#0f0f13;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-family:sans-serif;text-align:center;padding:20px;">
+            <h1 style="color:#ff5252;font-size:50px;">🚫</h1>
+            <h2>Ad-Blocker Detected!</h2>
+            <p style="color:#aaa;max-width:400px;">আমাদের সার্ভার খরচ চালানোর জন্য বিজ্ঞাপনের প্রয়োজন। দয়া করে আপনার <b>Ad-Blocker</b> বন্ধ করে পেজটি রিফ্রেশ দিন।</p>
+            <button onclick="window.location.reload()" style="background:#E50914;color:#fff;border:none;padding:12px 25px;border-radius:5px;cursor:pointer;font-weight:bold;margin-top:20px;font-size:16px;">আমি বন্ধ করেছি, রিফ্রেশ দিন!</button>
+        </div>`;
+      }}
+    }}
+    window.onload = function() {{ detectAdBlock(); }};
+    </script>
+
+    <!-- Hidden tags for Blogger SEO & Preview -->
     <div style="height:0px;width:0px;overflow:hidden;visibility:hidden;display:none;float:left;">
         <img src="{poster}" alt="{title} Thumbnail" />
     </div>
     <div style="display:none;font-size:1px;color:rgba(0,0,0,0);line-height:1px;max-height:0px;max-width:0px;opacity:0;overflow:hidden;">
-        🎬 {title} - {clean_desc[:100]}... Download now.
+        🎬 {title} - {clean_desc[:100]}... Download now in High Quality.
     </div>
 
-    <!-- Schema.org Data -->
-    <script type="application/ld+json">
-    {{
-      "@context": "https://schema.org",
-      "@type": "Movie",
-      "name": "{title}",
-      "image": "{poster}",
-      "description": "{clean_desc[:150]}"
-    }}
-    </script>
+    <!-- 💎 Single Clean Schema.org Data -->
     <script type="application/ld+json">
     {{
       "@context": "https://schema.org",
@@ -256,7 +282,7 @@ def generate_html_code(data, links, user_ad_links_list, owner_ad_links_list, adm
       "description": "{clean_desc[:150]}",
       "aggregateRating": {{
         "@type": "AggregateRating",
-        "ratingValue": 0,
+        "ratingValue": "{rating}",
         "bestRating": "10",
         "ratingCount": "150"
       }}
@@ -266,27 +292,37 @@ def generate_html_code(data, links, user_ad_links_list, owner_ad_links_list, adm
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         :root {{ {root_css} }}
-        body {{ margin: 0; padding: 0; background: var(--bg-color) !important; background-image: linear-gradient(to bottom, rgba(5,6,10,0.85), var(--bg-color)), url('{poster}') !important; background-attachment: fixed !important; background-size: cover !important; background-position: center !important; font-family: 'Poppins', sans-serif; }}
+        body {{ margin: 0; padding: 0; background: var(--bg-color) !important; background-image: linear-gradient(to bottom, rgba(5,6,10,0.85), var(--bg-color)), url('{bg_url}') !important; background-attachment: fixed !important; background-size: cover !important; background-position: center !important; font-family: 'Poppins', sans-serif; }}
         
-        .app-wrapper {{ max-width: 800px; margin: 20px auto; background: var(--box-bg); border-radius: 17px; padding: 25px; color: var(--text-main); border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.9); position: relative; overflow: visible !important; }}
+        .app-wrapper {{ max-width: 800px; margin: 20px auto; background: var(--box-bg); border-radius: 20px; padding: 25px; color: var(--text-main); border: 1px solid var(--border); box-shadow: 0 20px 50px rgba(0,0,0,0.9); position: relative; overflow: visible !important; }}
         
-        .movie-title {{ font-family: 'Oswald', sans-serif; font-size: 30px; color: var(--text-main); text-align: center; text-transform: uppercase; margin-bottom: 20px; background: linear-gradient(to right, #fff 20%, #777 80%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 1px; }}
+        .movie-title {{ font-family: 'Oswald', sans-serif; font-size: 35px; font-weight: bold; color: var(--text-main); text-align: center; text-transform: uppercase; margin-bottom: 30px; background: linear-gradient(to right, #fff 20%, #777 80%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 1px; }}
         
-        .info-box {{ display: flex; gap: 20px; margin-bottom: 25px; background: rgba(255,255,255,0.03) !important; border-radius: 20px !important; padding: 25px !important; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.05) !important; }}
-        .info-poster img {{ width: 150px; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.6); border: 2px solid rgba(255,255,255,0.1) !important; transition: 0.5s; }}
-        .info-poster img:hover {{ transform: scale(1.05) translateY(-10px); box-shadow: 0 10px 30px rgba(229, 9, 20, 0.4) !important; }}
+        .media-badges {{ display: flex; gap: 8px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap; }}
+        .badge {{ background: var(--primary); color: #fff; font-size: 11px; padding: 3px 10px; border-radius: 4px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; box-shadow: var(--btn-shadow); border: 1px solid rgba(255,255,255,0.2); }}
+        .badge-4k {{ color: #ffd700; border-color: #ffd700; background: rgba(255,255,255,0.1); }}
+        .badge-hdr {{ color: #00d1b2; border-color: #00d1b2; background: rgba(255,255,255,0.1); }}
         
-        .info-text {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; width: 100%; }}
-        .info-text div {{ background: rgba(0,0,0,0.1); padding: 10px; border-radius: 8px; border-left: 3px solid var(--primary); font-size: 13px; color: var(--text-main); border: 1px solid var(--border); margin-bottom: 8px !important; }}
-        .info-text span {{ display: block; color: var(--primary); font-size: 10px; text-transform: uppercase; font-weight: 600; margin-bottom: 3px; letter-spacing: 1px; }}
+        .info-box {{ display: flex; flex-direction: column; align-items: center; gap: 20px; margin-bottom: 25px; background: rgba(255,255,255,0.03) !important; border-radius: 20px !important; padding: 25px !important; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.05) !important; }}
+        .info-poster img {{ width: 180px; border-radius: 15px; box-shadow: var(--btn-shadow); border: 2px solid rgba(255,255,255,0.1) !important; transition: 0.5s; }}
+        .info-poster img:hover {{ transform: scale(1.05) translateY(-10px); }}
         
-        @media (max-width: 500px) {{ .info-box {{ flex-direction: column; align-items: center; text-align: center; }} .info-poster img {{ width: 140px; }} }}
+        .info-text {{ display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 400px; margin: 0 auto; }}
+        .info-text div {{ background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; font-size: 16px; font-weight: 600; color: var(--text-main); border: 1px solid var(--border); text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }}
+        .info-text span {{ display: block; color: var(--primary); font-size: 12px; text-transform: uppercase; font-weight: bold; margin-bottom: 5px; letter-spacing: 1.5px; }}
         
         .section-title {{ font-size: 16px; color: var(--text-main); margin: 25px 0 15px; border-bottom: 2px solid var(--primary); display: inline-block; padding-bottom: 4px; font-weight: 600; text-transform: uppercase; }}
         .plot-box {{ background: rgba(0,0,0,0.1); padding: 15px; border-radius: 8px; font-size: 13px; line-height: 1.7; color: var(--text-muted); border: 1px solid var(--border); text-align: justify; }}
         
-        .guide-box {{ background: rgba(0,0,0,0.1); border: 1px dashed var(--primary); padding: 15px; border-radius: 10px; margin-top: 25px; margin-bottom: 20px; }}
-        
+        /* 🔥 Bangla Guide CSS */
+        .guide-container {{ background: rgba(229, 9, 20, 0.05); border: 2px dashed var(--primary); border-radius: 15px; padding: 20px; margin: 25px 0; font-family: 'Poppins', sans-serif; text-align: left; color: #fff; animation: borderPulse 2s infinite; }}
+        .guide-header {{ color: var(--primary); font-weight: bold; font-size: 18px; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }}
+        .step {{ display: flex; gap: 15px; margin-bottom: 12px; align-items: flex-start; }}
+        .step-num {{ background: var(--primary); color: #fff; min-width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; flex-shrink: 0; margin-top: 2px; box-shadow: var(--btn-shadow); }}
+        .step-text {{ font-size: 14px; line-height: 1.5; color: var(--text-muted); }}
+        .step-text b {{ color: #ffeb3b; }}
+        @keyframes borderPulse {{ 0% {{ border-color: var(--primary); }} 50% {{ border-color: #ff5252; }} 100% {{ border-color: var(--primary); }} }}
+
         .step-container {{ background: rgba(0,0,0,0.2); padding: 25px; border-radius: 12px; text-align: center; border: 1px solid var(--border); position: relative; overflow: hidden; }}
         .step-title {{ color: var(--primary); font-size: 14px; font-weight: 600; letter-spacing: 1px; margin-bottom: 15px; text-transform: uppercase; }}
         .unlock-btn {{ background: var(--primary); color: #fff; border: none; padding: 15px 20px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; width: 100%; box-shadow: var(--btn-shadow); }}
@@ -299,22 +335,16 @@ def generate_html_code(data, links, user_ad_links_list, owner_ad_links_list, adm
         
         .rgb-btn-wrapper {{ position: relative; border-radius: 8px; padding: 2px; background: linear-gradient(45deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000); background-size: 400%; animation: glowing 20s linear infinite; }}
         .rgb-btn {{ background: #1a1c22 !important; width: 100%; height: 100%; border: none; border-radius: 6px; padding: 15px; cursor: pointer; transition: 0.3s; display: flex; flex-direction: column; align-items: center; justify-content: center; }}
-        .rgb-btn:hover {{ background: #E50914 !important; filter: brightness(1.2); transform: translateY(-5px); box-shadow: 0 10px 20px rgba(229, 9, 20, 0.3) !important; }}
+        .rgb-btn:hover {{ background: var(--primary) !important; filter: brightness(1.2); transform: translateY(-5px); box-shadow: var(--btn-shadow); }}
         
         @keyframes glowing {{ 0% {{ background-position: 0 0; }} 50% {{ background-position: 400% 0; }} 100% {{ background-position: 0 0; }} }}
-        
-        .media-badges {{ display: flex; gap: 8px; justify-content: center; margin-bottom: 15px; flex-wrap: wrap; }}
-        .badge {{ background: var(--primary); color: #fff; font-size: 11px; padding: 4px 12px; border-radius: 20px; font-weight: 600; text-transform: uppercase; box-shadow: var(--btn-shadow); border: 1px solid rgba(255,255,255,0.2); }}
         .nsfw-blur {{ filter: blur(25px) !important; }}
     </style>
 
     <div class="app-wrapper">
         <div id="view-details">
             <div class="media-badges">
-                <div class="badge">{lang_str}</div>
-                <div class="badge">⭐ {rating}/10</div>
-                <div class="badge">{year}</div>
-                <div class="badge">HEVC</div>
+                {badges_html}
             </div>
             
             <div class="movie-title">{title}</div>
@@ -336,13 +366,13 @@ def generate_html_code(data, links, user_ad_links_list, owner_ad_links_list, adm
             <div class="section-title">📖 Storyline</div>
             <div class="plot-box">{overview}</div>
 
-            <div class="guide-box">
-                <div style="color:var(--primary); font-weight:bold; font-size:15px; margin-bottom:8px;">🎬 কিভাবে ডাউনলোড করবেন?</div>
-                <div style="font-size:13px; color:var(--text-muted); line-height:1.6;">
-                    ১. নিচের <b>STEP 1</b> বাটনে ক্লিক করুন এবং ৫ সেকেন্ড অপেক্ষা করুন।<br>
-                    ২. এরপর বাটনটি সবুজ হয়ে <b>STEP 2</b> লেখা আসবে, সেখানে ক্লিক করে আবার ৫ সেকেন্ড অপেক্ষা করুন।<br>
-                    ৩. ব্যাস! মুভি দেখার এবং ডাউনলোড করার আসল লিংক পেয়ে যাবেন।
-                </div>
+            <div class="guide-container">
+                <div class="guide-header">🎬 মুভিটি কিভাবে দেখবেন বা ডাউনলোড করবেন?</div>
+                <div class="step"><div class="step-num">১</div><div class="step-text">নিচের <b>"Watch Online"</b> বা <b>"Download"</b> বাটনে ক্লিক করুন।</div></div>
+                <div class="step"><div class="step-num">২</div><div class="step-text">বাটনে ক্লিক করলে একটি বিজ্ঞাপন (Ad) ওপেন হতে পারে, সেটি কেটে দিয়ে <b>এই পেজেই ফিরে আসুন</b>।</div></div>
+                <div class="step"><div class="step-num">৩</div><div class="step-text">এরপর ৫ সেকেন্ড অপেক্ষা করুন। টাইমার শেষ হলে অটোমেটিক নিচের দিকে <b>সার্ভার লিস্ট এবং প্লেয়ার</b> খুলে যাবে।</div></div>
+                <div class="step"><div class="step-num">৪</div><div class="step-text">আপনার পছন্দের যেকোনো সার্ভারে (যেমন: <b>GoFile, Catbox বা Telegram</b>) ক্লিক করে হাই-স্পিডে মুভি উপভোগ করুন!</div></div>
+                <div style="font-size: 12px; color: #888; margin-top: 10px; text-align: center; font-style: italic;">⚠️ যদি কোনো লিংক কাজ না করে, তবে টেলিগ্রাম গ্রুপে রিপোর্ট করুন।</div>
             </div>
 
             <div class="step-container" id="step-box">
@@ -356,7 +386,6 @@ def generate_html_code(data, links, user_ad_links_list, owner_ad_links_list, adm
             
             {server_list_html}
 
-            <!-- Share Section -->
             <div style="margin-top: 40px; padding: 20px; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
                 <div style="font-size: 14px; color: #fff; margin-bottom: 15px; font-weight: 600;">🔗 মুভিটি বন্ধুদের সাথে শেয়ার করুন:</div>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
@@ -432,6 +461,15 @@ def generate_formatted_caption(data, pid=None):
     if is_adult: caption += "⚠️ **WARNING: 18+ Content.**\n_Suitable for mature audiences only._\n\n"
     if not data.get('is_manual'): caption += f"**🎭 Genres:** {genres}\n**🗣️ Language:** {language}\n**⭐ Rating:** {rating}\n\n"
     caption += f"**📝 Plot:** _{overview[:300]}..._\n\n⚠️ _Disclaimer: Informational post only._"
+
+    # 🔥 SEO Tags Logic Added to Caption (from seo_and_timer plugin)
+    tags = [
+        f"{title} Full Movie Download", f"{title} {year} Dual Audio", 
+        f"{title} {language} Download", f"{title} HD 1080p", 
+        f"Download {title} Movie", "CineZoneBD1", "Banglaflix4k"
+    ]
+    caption += f"\n\n🏷️ **SEO Labels:**\n`{', '.join(tags)}`"
+    
     return caption
 
 def generate_image(data):
