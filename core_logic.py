@@ -301,8 +301,8 @@ def generate_html_code(data, links, user_ad_links_list, owner_ad_links_list, adm
         .badge-4k {{ color: #ffd700; border-color: #ffd700; background: rgba(255,255,255,0.1); }}
         .badge-hdr {{ color: #00d1b2; border-color: #00d1b2; background: rgba(255,255,255,0.1); }}
         
-        .info-box {{ display: flex; flex-direction: column; align-items: center; gap: 20px; margin-bottom: 25px; background: rgba(255,255,255,0.03) !important; border-radius: 20px !important; padding: 25px !important; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.05) !important; }}
-        .info-poster img {{ width: 180px; height: 270px; object-fit: cover; border-radius: 15px; box-shadow: var(--btn-shadow); border: 2px solid rgba(255,255,255,0.1) !important; transition: 0.5s; }}
+        .info-box {{ display: flex; flex-direction: column; align-items: center; gap: 20px; margin-bottom: 25px; background: rgba(255,255,255,0.03) !important; border-radius: 20px !important; padding: 25px !important; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.05) !important; margin-top: 30px; }}
+        .info-poster img {{ max-width: 100%; height: auto; border-radius: 15px; box-shadow: var(--btn-shadow); border: 2px solid rgba(255,255,255,0.1) !important; transition: 0.5s; }}
         .info-poster img:hover {{ transform: scale(1.05) translateY(-10px); }}
         
         .info-text {{ display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 400px; margin: 0 auto; }}
