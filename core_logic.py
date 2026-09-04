@@ -138,10 +138,8 @@ def apply_badge_to_poster(poster_bytes, text):
         return img_buffer
     except: return io.BytesIO(poster_bytes)
 
-# 🔥 Plugin Compatibility Maintained (5 arguments only)
 def generate_html_code(data, links, user_ad_links_list, owner_ad_links_list, admin_share_percent=20):
     
-    # 🔥 Data Dictionary থেকে টাইমারটি বের করা হলো (এতে আর এরর আসবে না)
     wait_timer_seconds = data.get("wait_time", 5)
     
     title = data.get("title") or data.get("name")
@@ -302,12 +300,15 @@ def generate_html_code(data, links, user_ad_links_list, owner_ad_links_list, adm
         .badge-hdr {{ color: #00d1b2; border-color: #00d1b2; background: rgba(255,255,255,0.1); }}
         
         .info-box {{ display: flex; flex-direction: column; align-items: center; gap: 20px; margin-bottom: 25px; background: rgba(255,255,255,0.03) !important; border-radius: 20px !important; padding: 25px !important; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.05) !important; margin-top: 30px; }}
-        .info-poster img {{ max-width: 100%; height: auto; border-radius: 15px; box-shadow: var(--btn-shadow); border: 2px solid rgba(255,255,255,0.1) !important; transition: 0.5s; }}
+        
+        /* 🔥 FIX: ছবির অরিজিনাল সাইজ বজায় রাখার জন্য width ও height অটো করা হলো */
+        .info-poster img {{ width: 100%; max-width: 200px; height: auto; border-radius: 15px; box-shadow: var(--btn-shadow); border: 2px solid rgba(255,255,255,0.1) !important; transition: 0.5s; }}
         .info-poster img:hover {{ transform: scale(1.05) translateY(-10px); }}
         
-        .info-text {{ display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 400px; margin: 0 auto; }}
-        .info-text div {{ background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; font-size: 16px; font-weight: 600; color: var(--text-main); border: 1px solid var(--border); text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }}
-        .info-text span {{ display: block; color: var(--primary); font-size: 12px; text-transform: uppercase; font-weight: bold; margin-bottom: 5px; letter-spacing: 1.5px; }}
+        /* 🔥 FIX: ৬টি বক্সকে সুন্দরভাবে ২ কলামে (পাশাপাশি) সাজানো হলো */
+        .info-text {{ display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; max-width: 500px; margin: 0 auto; }}
+        .info-text div {{ background: rgba(0,0,0,0.2); padding: 12px 5px; border-radius: 10px; font-size: 13px; font-weight: 600; color: var(--text-main); border: 1px solid var(--border); text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }}
+        .info-text span {{ display: block; color: var(--primary); font-size: 11px; text-transform: uppercase; font-weight: bold; margin-bottom: 5px; letter-spacing: 1px; }}
         
         .section-title {{ font-size: 16px; color: var(--text-main); margin: 25px 0 15px; border-bottom: 2px solid var(--primary); display: inline-block; padding-bottom: 4px; font-weight: 600; text-transform: uppercase; }}
         .plot-box {{ background: rgba(0,0,0,0.1); padding: 15px; border-radius: 8px; font-size: 13px; line-height: 1.7; color: var(--text-muted); border: 1px solid var(--border); text-align: justify; }}
