@@ -301,8 +301,8 @@ def generate_html_code(data, links, user_ad_links_list, owner_ad_links_list, adm
         
         .info-box {{ display: flex; flex-direction: column; align-items: center; gap: 20px; margin-bottom: 25px; background: rgba(255,255,255,0.03) !important; border-radius: 20px !important; padding: 25px !important; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.05) !important; margin-top: 30px; }}
         
-        /* 🔥 FIX: ছবির অরিজিনাল সাইজ বজায় রাখার জন্য width ও height অটো করা হলো */
-        .info-poster img {{ width: 100%; max-width: 200px; height: auto; border-radius: 15px; box-shadow: var(--btn-shadow); border: 2px solid rgba(255,255,255,0.1) !important; transition: 0.5s; }}
+        /* 🔥 FIX: ছবির অরিজিনাল সাইজ বজায় রাখার জন্য width ও height ফিক্সড করে contain করা হলো */
+        .info-poster img {{ width: 180px; height: 270px; object-fit: contain; background: rgba(0,0,0,0.4); border-radius: 15px; box-shadow: var(--btn-shadow); border: 2px solid rgba(255,255,255,0.1) !important; transition: 0.5s; }}
         .info-poster img:hover {{ transform: scale(1.05) translateY(-10px); }}
         
         /* 🔥 FIX: ৬টি বক্সকে সুন্দরভাবে ২ কলামে (পাশাপাশি) সাজানো হলো */
